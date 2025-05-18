@@ -8,8 +8,9 @@ pygame.init()
 
 # === Window Setup ===
 WINDOW_SIZE = [400, 400]
-screen = pygame.display.set_mode(WINDOW_SIZE)
+screen = pygame.display.set_mode([WINDOW_SIZE[0], WINDOW_SIZE[1] + 30])
 pygame.display.set_caption("Snake Game")
+pygame.display.set_icon(loader.icon)
 
 # === Game Variables ===
 clock = pygame.time.Clock()
@@ -25,7 +26,7 @@ startTick = function.starter_tick()
 SNAKE_SIZE = 20
 SNAKE_SPEED = 20
 snake_velocity = [SNAKE_SPEED, 0]
-snake = [[WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2]]  # Initial position (center)
+snake = [[WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2],]  # Initial position (center)
 
 # Apple properties
 apple = {
@@ -51,6 +52,21 @@ while running:
                 snake_velocity = [-SNAKE_SPEED, 0]
             elif event.key == pygame.K_RIGHT and snake_velocity[0] == 0:
                 snake_velocity = [SNAKE_SPEED, 0]
+            elif event.key == pygame.K_ESCAPE:
+                # Pause the game when ESC is pressed
+                paused = True
+                while paused:
+                    for pause_event in pygame.event.get():
+                        if pause_event.type == pygame.QUIT:
+                            running = False
+                            paused = False
+                        elif pause_event.type == pygame.KEYDOWN:
+                            if pause_event.key == pygame.K_ESCAPE:
+                                paused = False
+                    function.text_objects("game version: " + loader.gameVersion, loader.scoreFont, loader.white, [10, WINDOW_SIZE[1] + 5], screen)
+                    function.message("Paused", WINDOW_SIZE, screen, loader.white, loader.uiBackground, loader.titleFont)
+                    pygame.display.update()
+                    clock.tick(5)
 
     # === Apple Spawn ===
     if not apple["available"]:
@@ -93,6 +109,10 @@ while running:
         function.draw_apple(SNAKE_SIZE, apple, screen, loader.red)
 
     function.draw_snake(SNAKE_SIZE, snake, screen, loader.white)
+
+    pygame.draw.rect(screen, loader.uiBackground, [0, WINDOW_SIZE[1], WINDOW_SIZE[0], 30])
+    function.show_score(len(snake) - 1, screen, loader.scoreFont, loader.white, [10, WINDOW_SIZE[1] + 5])
+    function.text_objects(str(tickRate), loader.scoreFont, loader.white, [WINDOW_SIZE[0] - 50, WINDOW_SIZE[1] + 5], screen)
 
     pygame.display.update()
     clock.tick(tickRate)

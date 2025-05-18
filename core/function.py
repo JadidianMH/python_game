@@ -1,8 +1,8 @@
 import pygame
 
-def show_score(score, screen, font, color):
+def show_score(score, screen, font, color, place):
     scoreText = font.render('score:' + str(score), False, color)
-    screen.blit(scoreText, [35, 10])
+    screen.blit(scoreText, place)
 
 def draw_snake(snakeSize, snakeList, screen, color):
     for x in snakeList:
@@ -15,6 +15,10 @@ def message(status, size, screen, color, bg, font):
 
 def draw_apple(appleSize, apple, screen, color):
     pygame.draw.rect(screen, color, [apple["pos"][0], apple["pos"][1], appleSize, appleSize])
+
+def text_objects(text, font, color, place, screen):
+    text = font.render(text, False, color)
+    screen.blit(text, place)
 
 def starter_tick():
     return pygame.time.get_ticks()
