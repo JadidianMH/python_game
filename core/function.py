@@ -15,3 +15,6 @@ def message(status, size, screen, color, bg, font):
 
 def draw_apple(appleSize, apple, screen, color):
     pygame.draw.rect(screen, color, [apple["pos"][0], apple["pos"][1], appleSize, appleSize])
+
+def starter_tick():
+    return pygame.time.get_ticks()

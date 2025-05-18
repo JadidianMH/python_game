@@ -14,6 +14,12 @@ pygame.display.set_caption("Snake Game")
 # === Game Variables ===
 clock = pygame.time.Clock()
 running = True
+normalTickRate = 10
+tickRate = normalTickRate
+timer = True
+
+# === Timer Setup ===
+startTick = function.starter_tick()
 
 # Snake properties
 SNAKE_SIZE = 20
@@ -65,12 +71,14 @@ while running:
        snake[-1][1] < 0 or snake[-1][1] > WINDOW_SIZE[1]:
         function.message("Game Over", WINDOW_SIZE, screen, loader.red, loader.black, loader.titleFont)
         pygame.display.update()
-        pygame.time.delay(3000)
+        pygame.time.delay(1500)
 
         # Reset the game
         snake = [[WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2]]
         snake_velocity = [SNAKE_SPEED, 0]
         apple["available"] = False
+        tickRate = 5
+        startTick = function.starter_tick()
         continue
         
 
@@ -87,6 +95,9 @@ while running:
     function.draw_snake(SNAKE_SIZE, snake, screen, loader.white)
 
     pygame.display.update()
-    clock.tick(12)
+    clock.tick(tickRate)
+
+    if pygame.time.get_ticks() - startTick > 3000:
+        tickRate = normalTickRate
 
 pygame.quit()
