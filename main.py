@@ -18,6 +18,7 @@ running = True
 normalTickRate = 10
 tickRate = normalTickRate
 timer = True
+paused = True
 
 # === Timer Setup ===
 startTick = function.starter_tick()
@@ -55,18 +56,19 @@ while running:
             elif event.key == pygame.K_ESCAPE:
                 # Pause the game when ESC is pressed
                 paused = True
-                while paused:
-                    for pause_event in pygame.event.get():
-                        if pause_event.type == pygame.QUIT:
-                            running = False
-                            paused = False
-                        elif pause_event.type == pygame.KEYDOWN:
-                            if pause_event.key == pygame.K_ESCAPE:
-                                paused = False
-                    function.text_objects("game version: " + loader.gameVersion, loader.scoreFont, loader.white, [10, WINDOW_SIZE[1] + 5], screen)
-                    function.message("Paused", WINDOW_SIZE, screen, loader.white, loader.uiBackground, loader.titleFont)
-                    pygame.display.update()
-                    clock.tick(5)
+    
+    while paused:
+        function.text_objects("game version: " + loader.gameVersion, loader.scoreFont, loader.white, [10, WINDOW_SIZE[1] + 5], screen)
+        function.message("Paused", WINDOW_SIZE, screen, loader.white, loader.uiBackground, loader.titleFont)
+        pygame.display.update()
+        clock.tick(60)
+        for pause_event in pygame.event.get():
+            if pause_event.type == pygame.QUIT:
+                running = False
+                paused = False
+            elif pause_event.type == pygame.KEYDOWN:
+                if pause_event.key == pygame.K_ESCAPE:
+                    paused = False
 
     # === Apple Spawn ===
     if not apple["available"]:
@@ -84,7 +86,8 @@ while running:
 
     # === Wall Collision ===
     if snake[-1][0] < 0 or snake[-1][0] > WINDOW_SIZE[0] or \
-       snake[-1][1] < 0 or snake[-1][1] > WINDOW_SIZE[1]:
+       snake[-1][1] < 0 or snake[-1][1] > WINDOW_SIZE[1] or \
+       snake[-1] in snake[:-1]:
         function.message("Game Over", WINDOW_SIZE, screen, loader.red, loader.black, loader.titleFont)
         pygame.display.update()
         pygame.time.delay(1500)
