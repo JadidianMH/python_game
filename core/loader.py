@@ -1,5 +1,8 @@
 import pygame
 
+pygame.init()
+pygame.font.init()
+
 # common variables
 scoreFont = pygame.font.SysFont('calibri', 20)
 titleFont = pygame.font.SysFont('calibri', 30)

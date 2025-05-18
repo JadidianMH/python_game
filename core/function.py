@@ -1,10 +1,14 @@
 import pygame
-import loader
 
-def show_score(score, screen):
-    scoreText = loader.scoreFont.render('score:' + str(score), True, loader.black)
+def show_score(score, screen, font):
+    scoreText = font.render('score:' + str(score), True, loader.black)
     screen.blit(scoreText, [35, 10])
 
-def draw_snake(snakeSize, snakeList, screen):
+def draw_snake(snakeSize, snakeList, screen, color):
     for x in snakeList:
-        pygame.draw.rect(screen, loader.white, [x[0], x[1], snakeSize, snakeSize])
+        pygame.draw.rect(screen, color, [x[0], x[1], snakeSize, snakeSize])
+
+def message(status, size, screen, color, bg, font):
+    pygame.draw.rect(screen, bg, [0, 0, size[0], size[1]])
+    Message = font.render(status, True, color)
+    screen.blit(Message, size / 2)
