@@ -87,6 +87,6 @@ while running:
     function.draw_snake(SNAKE_SIZE, snake, screen, loader.white)
 
     pygame.display.update()
-
+    clock.tick(12)
 
 pygame.quit()
