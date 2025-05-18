@@ -2,6 +2,7 @@ import pygame
 import random
 import core.loader as loader
 import core.function as function
+import winsound
 
 # === Initialization ===
 pygame.init()
@@ -55,6 +56,7 @@ while running:
                 snake_velocity = [SNAKE_SPEED, 0]
             elif event.key == pygame.K_ESCAPE:
                 # Pause the game when ESC is pressed
+                winsound.Beep(1000, 500)
                 paused = True
     
     while paused:
@@ -84,12 +86,17 @@ while running:
     ]
     snake.append(new_head)
 
-    # === Wall Collision ===
+    # === Wall Collision And Self-Kill ===
     if snake[-1][0] < 0 or snake[-1][0] > WINDOW_SIZE[0] or \
        snake[-1][1] < 0 or snake[-1][1] > WINDOW_SIZE[1] or \
        snake[-1] in snake[:-1]:
         function.message("Game Over", WINDOW_SIZE, screen, loader.red, loader.black, loader.titleFont)
         pygame.display.update()
+        # Play sound
+        soundLenth = 7
+        while soundLenth > 1:
+            soundLenth -= 1
+            winsound.Beep(soundLenth * 100, 300)
         pygame.time.delay(1500)
 
         # Reset the game
@@ -103,6 +110,8 @@ while running:
 
     # === Apple Collision ===
     if apple["available"] and new_head == apple["pos"]:
+        # Play sound
+        winsound.Beep(500, 1000)
         apple["available"] = False  # Snake eats the apple (grows)
     else:
         snake.pop(0)  # If no apple eaten, remove tail
