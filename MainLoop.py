@@ -53,13 +53,26 @@ while running:
             random.randint(0, WINDOW_SIZE[1] // SNAKE_SIZE - 1) * SNAKE_SIZE
         ]
         apple["available"] = True
-
     # === Snake Movement ===
     new_head = [
         snake[-1][0] + snake_velocity[0],
         snake[-1][1] + snake_velocity[1]
     ]
     snake.append(new_head)
+
+    # === Wall Collision ===
+    if snake[-1][0] < 0 or snake[-1][0] > WINDOW_SIZE[0] or \
+       snake[-1][1] < 0 or snake[-1][1] > WINDOW_SIZE[1]:
+        function.message("Game Over", WINDOW_SIZE, screen, loader.red, loader.black, loader.titleFont)
+        pygame.display.update()
+        pygame.time.delay(3000)
+
+        # Reset the game
+        snake = [[WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2]]
+        snake_velocity = [SNAKE_SPEED, 0]
+        apple["available"] = False
+        continue
+        
 
     # === Apple Collision ===
     if apple["available"] and new_head == apple["pos"]:
@@ -74,6 +87,6 @@ while running:
     function.draw_snake(SNAKE_SIZE, snake, screen, loader.white)
 
     pygame.display.update()
-    clock.tick(12)
+
 
 pygame.quit()
