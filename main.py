@@ -40,6 +40,7 @@ apple = {
 
 # === Game Loop ===
 while running:
+    direction = None
     screen.fill(loader.black)
 
     # === Event Handling ===
@@ -63,6 +64,40 @@ while running:
 
             elif event.key == pygame.K_s:
                 screenshut = True
+
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                # Left mouse button clicked
+                if event.pos[0] < WINDOW_SIZE[0] and event.pos[1] < WINDOW_SIZE[1]:
+                    # Check if the click is within the game area
+                    if paused:
+                        paused = False
+                    else:
+                        paused = True
+            elif event.button == 3:
+                # Right mouse button clicked
+                mx, my = event.pos
+                cx, cy = WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2
+                dx = mx - cx
+                dy = my - cy
+
+                # Determine the direction based on the click position
+                if abs(dx) > abs(dy):
+                    if dx > 0 and snake_velocity[0] == 0:
+                        snake_velocity = [SNAKE_SPEED, 0] # Move right
+                    elif dx < 0 and snake_velocity[0] == 0:
+                        snake_velocity = [-SNAKE_SPEED, 0] # Move left
+                else:
+                    if dy > 0 and snake_velocity[1] == 0:
+                        snake_velocity = [0, SNAKE_SPEED] # Move down
+                    elif dy < 0 and snake_velocity[1] == 0:
+                        snake_velocity = [0, -SNAKE_SPEED] # Move up
+
+                # Print the direction
+                print("Clicked: ", direction)
+    if direction is not None:
+        # Update snake velocity based on the clicked direction
+        snake_velocity = [direction[0] * SNAKE_SPEED, direction[1] * SNAKE_SPEED]
     
     while paused:
         function.text_objects("game version: " + loader.gameVersion, loader.scoreFont, loader.white, [10, WINDOW_SIZE[1] + 5], screen)
