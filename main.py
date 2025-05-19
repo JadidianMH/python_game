@@ -3,6 +3,7 @@ import random
 import core.loader as loader
 import core.function as function
 import winsound
+import time
 
 # === Initialization ===
 pygame.init()
@@ -20,6 +21,7 @@ normalTickRate = 10
 tickRate = normalTickRate
 timer = True
 paused = True
+screenshut = False
 
 # === Timer Setup ===
 startTick = function.starter_tick()
@@ -58,6 +60,9 @@ while running:
                 # Pause the game when ESC is pressed
                 winsound.Beep(1000, 500)
                 paused = True
+
+            elif event.key == pygame.K_s:
+                screenshut = True
     
     while paused:
         function.text_objects("game version: " + loader.gameVersion, loader.scoreFont, loader.white, [10, WINDOW_SIZE[1] + 5], screen)
@@ -131,5 +136,8 @@ while running:
 
     if pygame.time.get_ticks() - startTick > 3000:
         tickRate = normalTickRate
+    if screenshut:
+        screenshut = False
+        function.save_screenshot(screen)
 
 pygame.quit()

@@ -1,4 +1,5 @@
 import pygame
+import time
 
 def show_score(score, screen, font, color, place):
     scoreText = font.render('score:' + str(score), False, color)
@@ -22,3 +23,8 @@ def text_objects(text, font, color, place, screen):
 
 def starter_tick():
     return pygame.time.get_ticks()
+
+def save_screenshot(screen):
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    pygame.image.save(screen, f"screenshot_{timestamp}.png")
+    print(f"screenshot was saved: screenshot_{timestamp}.png")
