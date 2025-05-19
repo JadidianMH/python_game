@@ -3,7 +3,6 @@ import random
 import core.loader as loader
 import core.function as function
 import winsound
-import time
 
 # === Initialization ===
 pygame.init()
@@ -16,11 +15,8 @@ pygame.display.set_icon(loader.icon)
 
 # === Game Variables ===
 clock = pygame.time.Clock()
-running = True
 normalTickRate = 10
 tickRate = normalTickRate
-timer = True
-paused = True
 screenshut = False
 
 # === Timer Setup ===
@@ -30,7 +26,7 @@ startTick = function.starter_tick()
 SNAKE_SIZE = 20
 SNAKE_SPEED = 20
 snake_velocity = [SNAKE_SPEED, 0]
-snake = [[WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2],]  # Initial position (center)
+snake = [[WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2]]
 
 # Apple properties
 apple = {
@@ -38,9 +34,15 @@ apple = {
     "available": False
 }
 
-# === Game Loop ===
+# === Game State ===
+STATE_RUNNING = "running"
+STATE_PAUSED = "paused"
+STATE_GAMEOVER = "gameover"
+state = STATE_PAUSED
+
+running = True
+
 while running:
-    direction = None
     screen.fill(loader.black)
 
     # === Event Handling ===
@@ -49,68 +51,72 @@ while running:
             running = False
 
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP and snake_velocity[1] == 0:
-                snake_velocity = [0, -SNAKE_SPEED]
-            elif event.key == pygame.K_DOWN and snake_velocity[1] == 0:
-                snake_velocity = [0, SNAKE_SPEED]
-            elif event.key == pygame.K_LEFT and snake_velocity[0] == 0:
-                snake_velocity = [-SNAKE_SPEED, 0]
-            elif event.key == pygame.K_RIGHT and snake_velocity[0] == 0:
-                snake_velocity = [SNAKE_SPEED, 0]
-            elif event.key == pygame.K_ESCAPE:
-                # Pause the game when ESC is pressed
-                winsound.Beep(1000, 500)
-                paused = True
-
-            elif event.key == pygame.K_s:
-                screenshut = True
+            if event.key == pygame.K_ESCAPE:
+                if state == STATE_RUNNING:
+                    winsound.Beep(1000, 500)
+                    state = STATE_PAUSED
+                elif state == STATE_PAUSED:
+                    state = STATE_RUNNING
+            if state == STATE_RUNNING:
+                if event.key == pygame.K_UP and snake_velocity[1] == 0:
+                    snake_velocity = [0, -SNAKE_SPEED]
+                elif event.key == pygame.K_DOWN and snake_velocity[1] == 0:
+                    snake_velocity = [0, SNAKE_SPEED]
+                elif event.key == pygame.K_LEFT and snake_velocity[0] == 0:
+                    snake_velocity = [-SNAKE_SPEED, 0]
+                elif event.key == pygame.K_RIGHT and snake_velocity[0] == 0:
+                    snake_velocity = [SNAKE_SPEED, 0]
+                elif event.key == pygame.K_s:
+                    screenshut = True
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
+            if event.button == 3:
                 # Left mouse button clicked
                 if event.pos[0] < WINDOW_SIZE[0] and event.pos[1] < WINDOW_SIZE[1]:
-                    # Check if the click is within the game area
-                    if paused:
-                        paused = False
-                    else:
-                        paused = True
-            elif event.button == 3:
+                    if state == STATE_PAUSED:
+                        state = STATE_RUNNING
+                    elif state == STATE_RUNNING:
+                        state = STATE_PAUSED
+            elif event.button == 1 and state == STATE_RUNNING:
                 # Right mouse button clicked
                 mx, my = event.pos
                 cx, cy = WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2
                 dx = mx - cx
                 dy = my - cy
-
-                # Determine the direction based on the click position
                 if abs(dx) > abs(dy):
                     if dx > 0 and snake_velocity[0] == 0:
-                        snake_velocity = [SNAKE_SPEED, 0] # Move right
+                        snake_velocity = [SNAKE_SPEED, 0]
                     elif dx < 0 and snake_velocity[0] == 0:
-                        snake_velocity = [-SNAKE_SPEED, 0] # Move left
+                        snake_velocity = [-SNAKE_SPEED, 0]
                 else:
                     if dy > 0 and snake_velocity[1] == 0:
-                        snake_velocity = [0, SNAKE_SPEED] # Move down
+                        snake_velocity = [0, SNAKE_SPEED]
                     elif dy < 0 and snake_velocity[1] == 0:
-                        snake_velocity = [0, -SNAKE_SPEED] # Move up
+                        snake_velocity = [0, -SNAKE_SPEED]
 
-                # Print the direction
-                print("Clicked: ", direction)
-    if direction is not None:
-        # Update snake velocity based on the clicked direction
-        snake_velocity = [direction[0] * SNAKE_SPEED, direction[1] * SNAKE_SPEED]
-    
-    while paused:
+    if state == STATE_PAUSED:
         function.text_objects("game version: " + loader.gameVersion, loader.scoreFont, loader.white, [10, WINDOW_SIZE[1] + 5], screen)
         function.message("Paused", WINDOW_SIZE, screen, loader.white, loader.uiBackground, loader.titleFont)
         pygame.display.update()
         clock.tick(60)
-        for pause_event in pygame.event.get():
-            if pause_event.type == pygame.QUIT:
-                running = False
-                paused = False
-            elif pause_event.type == pygame.KEYDOWN:
-                if pause_event.key == pygame.K_ESCAPE:
-                    paused = False
+        continue
+
+    if state == STATE_GAMEOVER:
+        function.message("Game Over", WINDOW_SIZE, screen, loader.red, loader.black, loader.titleFont)
+        pygame.display.update()
+        soundLenth = 7
+        while soundLenth > 2:
+            soundLenth -= 1
+            winsound.Beep(int(soundLenth * 120), 190)
+        pygame.time.delay(1500)
+        # Reset the game
+        snake = [[WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2]]
+        snake_velocity = [SNAKE_SPEED, 0]
+        apple["available"] = False
+        tickRate = 5
+        startTick = function.starter_tick()
+        state = STATE_PAUSED
+        continue
 
     # === Apple Spawn ===
     if not apple["available"]:
@@ -119,6 +125,7 @@ while running:
             random.randint(0, WINDOW_SIZE[1] // SNAKE_SIZE - 1) * SNAKE_SIZE
         ]
         apple["available"] = True
+
     # === Snake Movement ===
     new_head = [
         snake[-1][0] + snake_velocity[0],
@@ -130,38 +137,20 @@ while running:
     if snake[-1][0] < 0 or snake[-1][0] > WINDOW_SIZE[0] or \
        snake[-1][1] < 0 or snake[-1][1] > WINDOW_SIZE[1] or \
        snake[-1] in snake[:-1]:
-        function.message("Game Over", WINDOW_SIZE, screen, loader.red, loader.black, loader.titleFont)
-        pygame.display.update()
-        # Play sound
-        soundLenth = 7
-        while soundLenth > 1:
-            soundLenth -= 1
-            winsound.Beep(soundLenth * 100, 300)
-        pygame.time.delay(1500)
-
-        # Reset the game
-        snake = [[WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2]]
-        snake_velocity = [SNAKE_SPEED, 0]
-        apple["available"] = False
-        tickRate = 5
-        startTick = function.starter_tick()
+        state = STATE_GAMEOVER
         continue
-        
 
     # === Apple Collision ===
     if apple["available"] and new_head == apple["pos"]:
-        # Play sound
         winsound.Beep(500, 1000)
-        apple["available"] = False  # Snake eats the apple (grows)
+        apple["available"] = False
     else:
-        snake.pop(0)  # If no apple eaten, remove tail
+        snake.pop(0)
 
     # === Drawing ===
     if apple["available"]:
         function.draw_apple(SNAKE_SIZE, apple, screen, loader.red)
-
     function.draw_snake(SNAKE_SIZE, snake, screen, loader.white)
-
     pygame.draw.rect(screen, loader.uiBackground, [0, WINDOW_SIZE[1], WINDOW_SIZE[0], 30])
     function.show_score(len(snake) - 1, screen, loader.scoreFont, loader.white, [10, WINDOW_SIZE[1] + 5])
     function.text_objects(str(tickRate), loader.scoreFont, loader.white, [WINDOW_SIZE[0] - 50, WINDOW_SIZE[1] + 5], screen)
