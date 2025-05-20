@@ -11,13 +11,34 @@ pygame.init()
 WINDOW_SIZE = [400, 400]
 screen = pygame.display.set_mode([WINDOW_SIZE[0], WINDOW_SIZE[1] + 30])
 pygame.display.set_caption("Snake Game")
-pygame.display.set_icon(loader.icon)
+
+icon_surface = pygame.Surface((32, 32), pygame.SRCALPHA)
+icon_surface.fill((0, 0, 0, 0))
+
+pygame.draw.rect(icon_surface, (0, 200, 0), (4, 4, 24, 24))
+
+pygame.draw.rect(icon_surface, (0, 100, 0), (8, 20, 16, 6))
+
+pygame.draw.rect(icon_surface, (255, 255, 255), (2, 6, 6, 6))
+pygame.draw.rect(icon_surface, (0, 0, 0), (4, 8, 2, 2))
+
+pygame.draw.rect(icon_surface, (255, 255, 255), (24, 6, 6, 6))
+pygame.draw.rect(icon_surface, (0, 0, 0), (26, 8, 2, 2))
+
+pygame.draw.polygon(
+    icon_surface,
+    (255, 0, 0),
+    [(15, 26), (17, 26), (16, 32)]
+)
+pygame.display.set_icon(icon_surface)
+
 
 # === Game Variables ===
 clock = pygame.time.Clock()
 normalTickRate = 10
-tickRate = normalTickRate
+tickRate = 5
 screenshut = False
+slow = True
 
 # === Timer Setup ===
 startTick = function.starter_tick()
@@ -95,14 +116,23 @@ while running:
                         snake_velocity = [0, -SNAKE_SPEED]
 
     if state == STATE_PAUSED:
-        function.text_objects("game version: " + loader.gameVersion, loader.scoreFont, loader.white, [10, WINDOW_SIZE[1] + 5], screen)
-        function.message("Paused", WINDOW_SIZE, screen, loader.white, loader.uiBackground, loader.titleFont)
+        text = "PAUSED"
+        text_width = function.get_text_width(text, size=22, spacing=2)
+        x = (WINDOW_SIZE[0] - text_width) // 2
+        y = WINDOW_SIZE[1] // 2
+        function.draw_text(screen, text, [x, y], loader.white, 22, 2)
+        function.draw_text(screen, "game version: " + loader.gameVersion, [10, WINDOW_SIZE[1] + 5], loader.white, 15, 3)
         pygame.display.update()
         clock.tick(60)
         continue
 
     if state == STATE_GAMEOVER:
-        function.message("Game Over", WINDOW_SIZE, screen, loader.red, loader.black, loader.titleFont)
+        text = "GAME OVER"
+        text_width = function.get_text_width(text, size=22, spacing=2)
+        x = (WINDOW_SIZE[0] - text_width) // 2
+        y = WINDOW_SIZE[1] // 2
+        function.draw_text(screen, text, [x, y], loader.white, 22, 2)
+        slow = True
         pygame.display.update()
         soundLenth = 7
         while soundLenth > 2:
@@ -134,32 +164,34 @@ while running:
     snake.append(new_head)
 
     # === Wall Collision And Self-Kill ===
-    if snake[-1][0] < 0 or snake[-1][0] > WINDOW_SIZE[0] or \
-       snake[-1][1] < 0 or snake[-1][1] > WINDOW_SIZE[1] or \
+    if snake[-1][0] < 0 or snake[-1][0] >= WINDOW_SIZE[0] or \
+       snake[-1][1] < 0 or snake[-1][1] >= WINDOW_SIZE[1] or \
        snake[-1] in snake[:-1]:
         state = STATE_GAMEOVER
         continue
 
     # === Apple Collision ===
     if apple["available"] and new_head == apple["pos"]:
-        winsound.Beep(500, 1000)
+        tickRate += .1
         apple["available"] = False
     else:
         snake.pop(0)
 
     # === Drawing ===
+    function.draw_object(SNAKE_SIZE, snake, screen, loader.green, loader.shadow)
+    function.draw_object(50, [[0, WINDOW_SIZE[1]]], screen, loader.uiBackground, (0,0,0,0))
+    function.draw_text(screen, str(len(snake)), [10, WINDOW_SIZE[1] + 5], loader.white, 15, 3)
     if apple["available"]:
-        function.draw_apple(SNAKE_SIZE, apple, screen, loader.red)
-    function.draw_snake(SNAKE_SIZE, snake, screen, loader.white)
-    pygame.draw.rect(screen, loader.uiBackground, [0, WINDOW_SIZE[1], WINDOW_SIZE[0], 30])
-    function.show_score(len(snake) - 1, screen, loader.scoreFont, loader.white, [10, WINDOW_SIZE[1] + 5])
-    function.text_objects(str(tickRate), loader.scoreFont, loader.white, [WINDOW_SIZE[0] - 50, WINDOW_SIZE[1] + 5], screen)
+        function.draw_object(SNAKE_SIZE, [apple["pos"]], screen, loader.red, loader.shadow)
+
 
     pygame.display.update()
     clock.tick(tickRate)
 
-    if pygame.time.get_ticks() - startTick > 3000:
+    if pygame.time.get_ticks() - startTick > 3000 and slow:
         tickRate = normalTickRate
+        slow = False
+
     if screenshut:
         screenshut = False
         function.save_screenshot(screen)
