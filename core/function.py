@@ -2,13 +2,28 @@ import pygame
 import time
 
 def draw_objects(Size, List, screen, color, shadow):
+
+    shadow_surface = pygame.Surface((Size + 10, Size + 10), pygame.SRCALPHA)
+
     for x in List:
-        pygame.draw.rect(screen, shadow, [x[0] - 5, x[1] + 5, Size, Size])
+
+        shadow_surface.fill((0, 0, 0, 0))
+
+        pygame.draw.rect(shadow_surface, shadow, [5, 5, Size, Size])
+
+        screen.blit(shadow_surface, (x[0] - 5, x[1] + 5))
+
     for x in List:
         pygame.draw.rect(screen, color, [x[0], x[1], Size, Size])
 
 def draw_object(Size, pos, screen, color, shadow):
-    pygame.draw.rect(screen, shadow, [pos[0] - 5, pos[1] + 5, Size[0], Size[1]])
+    if not isinstance(shadow, bool):
+
+        shadow_surface = pygame.Surface((Size[0] + 10, Size[1] + 10), pygame.SRCALPHA)
+        shadow_surface.fill((0, 0, 0, 0))
+        pygame.draw.rect(shadow_surface, shadow, [5, 5, Size[0], Size[1]])
+        screen.blit(shadow_surface, (pos[0] - 5, pos[1] + 5))
+
     pygame.draw.rect(screen, color, [pos[0], pos[1], Size[0], Size[1]])
 
 def starter_tick():
@@ -322,3 +337,10 @@ def draw_text(screen, text, pos, color, size=22, spacing=4):
 
 def get_text_width(text, size=22, spacing=2):
     return len(text) * (size + spacing) - spacing
+
+def generate_checkered_ground(size, width, height):
+    ground = []
+    for y in range(0, height, size):
+        for x in range(0, width, size):
+            ground.append((x, y))
+    return ground

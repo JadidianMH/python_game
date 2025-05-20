@@ -61,6 +61,9 @@ STATE_PAUSED = "paused"
 STATE_GAMEOVER = "gameover"
 state = STATE_PAUSED
 
+# === Start Variables ===
+Ground = function.generate_checkered_ground(SNAKE_SIZE, WINDOW_SIZE[0], WINDOW_SIZE[1])
+
 running = True
 
 while running:
@@ -178,7 +181,19 @@ while running:
         snake.pop(0)
 
     # === Drawing ===
-    function.draw_objects(SNAKE_SIZE, snake, screen, loader.green, loader.shadow)
+    for tile in Ground:
+        x, y = tile
+        grid_x = x // SNAKE_SIZE
+        grid_y = y // SNAKE_SIZE
+
+        if (grid_x + grid_y) % 2 == 0:
+            tileColor = loader.lightGreen
+        else:
+            tileColor = loader.green
+
+        function.draw_object([SNAKE_SIZE, SNAKE_SIZE], tile, screen, tileColor, False)
+
+    function.draw_objects(SNAKE_SIZE, snake, screen, loader.violet, loader.shadow)
     function.draw_object([WINDOW_SIZE[0], 30], [0, WINDOW_SIZE[1]], screen, loader.uiBackground, loader.blank)
     function.draw_text(screen, str(len(snake)), [10, WINDOW_SIZE[1] + 5], loader.white, 15, 3)
     function.draw_text(screen, str(int(tickRate)), [WINDOW_SIZE[0] - 50, WINDOW_SIZE[1] + 5], loader.white, 15, 3)
