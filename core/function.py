@@ -1,25 +1,26 @@
 import pygame
 import time
 
-def draw_object(Size, List, screen, color, shadow):
+def draw_objects(Size, List, screen, color, shadow):
     for x in List:
         pygame.draw.rect(screen, shadow, [x[0] - 5, x[1] + 5, Size, Size])
     for x in List:
         pygame.draw.rect(screen, color, [x[0], x[1], Size, Size])
+
+def draw_object(Size, pos, screen, color, shadow):
+    pygame.draw.rect(screen, shadow, [pos[0] - 5, pos[1] + 5, Size[0], Size[1]])
+    pygame.draw.rect(screen, color, [pos[0], pos[1], Size[0], Size[1]])
 
 def starter_tick():
     global slow
     slow = True
     return pygame.time.get_ticks()
 
-
-
 def save_screenshot(screen):
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     pygame.image.save(screen, f"screenshot_{timestamp}.png")
     print(f"screenshot was saved: screenshot_{timestamp}.png")
 
-# فونت پیکسلی 5x5 برای حروف A-Z و اعداد 0-9
 pixel_font_5x5 = {
     'A': [
         "01110",
@@ -295,7 +296,7 @@ def draw_char(screen, ch, pos, color, size=22):
         return  # skip unsupported characters
     font = pixel_font_5x5[ch]
 
-    pixel_size = max(1, size // 6)  # یک پیکسل داخل فونت 5x5
+    pixel_size = max(1, size // 6)
     for y, row in enumerate(font):
         for x, bit in enumerate(row):
             if bit == '1':

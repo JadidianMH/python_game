@@ -178,13 +178,12 @@ while running:
         snake.pop(0)
 
     # === Drawing ===
-    function.draw_object(SNAKE_SIZE, snake, screen, loader.green, loader.shadow)
-    function.draw_object(50, [[0, WINDOW_SIZE[1]]], screen, loader.uiBackground, (0,0,0,0))
+    function.draw_objects(SNAKE_SIZE, snake, screen, loader.green, loader.shadow)
+    function.draw_object([WINDOW_SIZE[0], 30], [0, WINDOW_SIZE[1]], screen, loader.uiBackground, loader.blank)
     function.draw_text(screen, str(len(snake)), [10, WINDOW_SIZE[1] + 5], loader.white, 15, 3)
+    function.draw_text(screen, str(int(tickRate)), [WINDOW_SIZE[0] - 50, WINDOW_SIZE[1] + 5], loader.white, 15, 3)
     if apple["available"]:
-        function.draw_object(SNAKE_SIZE, [apple["pos"]], screen, loader.red, loader.shadow)
-
-
+        function.draw_object([SNAKE_SIZE, SNAKE_SIZE], apple["pos"], screen, loader.red, loader.shadow)
     pygame.display.update()
     clock.tick(tickRate)
 
