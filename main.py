@@ -80,6 +80,7 @@ while running:
        snake[-1] in snake[:-1]:
         function.die(snake, screen)
         state = STATE_GAMEOVER
+        slow = True
         continue
 
     # === Apple Collision ===
