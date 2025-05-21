@@ -1,4 +1,4 @@
-def draw_objects(Size, List, screen, color, shadow):
+def draw_objects(Size, List, screen, color, shadow, addPos=0):
 
     import pygame
 
@@ -280,7 +280,7 @@ def die(snake, screen):
                 if p.alpha <= 0:
                     particles.remove(p)
             pygame.display.update()
-            dt = clock.tick(10) / 1000
+            dt = clock.tick(12) / 1000
             timer += dt
 
 
@@ -293,5 +293,5 @@ def die(snake, screen):
             if p.alpha <= 0:
                 particles.remove(p)
         pygame.display.update()
-        dt = clock.tick(10) / 1000
+        dt = clock.tick(12) / 1000
         timer += dt

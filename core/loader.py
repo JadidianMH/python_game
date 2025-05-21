@@ -282,5 +282,14 @@ font = {
     ],
 }
 
+objects = {
+    'apple': [
+        '00100',
+        '01110',
+        '12221',
+        '12221',
+        '01110',
+    ]
+}
 
 gameVersion = data.version

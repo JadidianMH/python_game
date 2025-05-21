@@ -1,6 +1,7 @@
 import pygame
 import core.loader as loader
 import core.function as function
+import core.animation as animation
 
 # === Initialization ===
 pygame.init()
@@ -15,6 +16,7 @@ normalTickRate = 10
 tickRate = 5
 screenshut = False
 slow = True
+animation = animation.EatAnimation()
 
 # === Timer Setup ===
 startTick = function.starter_tick()
@@ -86,6 +88,8 @@ while running:
     # === Apple Collision ===
     if apple["available"] and new_head == apple["pos"]:
         tickRate += .1
+        animation.trigger(apple["pos"])
+
         apple["available"] = False
     else:
         snake.pop(0)
@@ -103,18 +107,37 @@ while running:
 
         function.draw_object([SNAKE_SIZE, SNAKE_SIZE], tile, screen, tileColor, False)
 
+    # button bar
     function.draw_object([WINDOW_SIZE[0], 30], [0, WINDOW_SIZE[1]], screen, loader.uiBackground, loader.blank)
+
+    # score
     function.draw_text(screen, str(len(snake)), [15, WINDOW_SIZE[1] + 10], loader.white, 15, 2)
+
+    # speed
     function.draw_text(screen, str(int(tickRate)), [WINDOW_SIZE[0] - 40, WINDOW_SIZE[1] + 10], loader.white, 15, 2)
+
+    # apple
     if apple["available"]:
         function.draw_object([SNAKE_SIZE, SNAKE_SIZE], apple["pos"], screen, loader.red, loader.shadow)
+    
+    # snake
     function.draw_objects(SNAKE_SIZE, snake, screen, loader.violet, loader.shadow)
-    pygame.display.update()
-    clock.tick(tickRate)
+
+    # food particle
+    animation.draw(screen)
+
 
     if pygame.time.get_ticks() - startTick > 3000 and slow:
         tickRate = normalTickRate
         slow = False
+
+
+    # draw everything
+    pygame.display.update()
+    dt = clock.tick(tickRate) / 1000
+
+    # update particle
+    animation.update(dt)
 
     if screenshut:
         screenshut = False
